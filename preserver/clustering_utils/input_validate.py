@@ -4,7 +4,8 @@ class InputValidator:
 
     @staticmethod
     def validate_input(df,QI_attr,Sensitive_attr,cat_indecies,verbose,max_iter,anonimize_ratio,max_cluster_distance,nan_replacement_int=0,nan_replacement_str=''):
-        QI_LEN,QI,_df,SA,IS_CAT,QI_RANGE_VAL,QI_RANGE_VAL,CAT_UNIQUE,NUM_COL,CAT_COL,_DEBUG,RANGE_FIX,CAT_INDEXES,NUM_COL_RANGE,CAT_COL_RANGE = validator(df,QI_attr,Sensitive_attr,cat_indecies,nan_replacement_int,nan_replacement_str)
+        QI_LEN,QI,_df,SA,IS_CAT,QI_RANGE_VAL,QI_RANGE_VAL,CAT_UNIQUE,NUM_COL,CAT_COL,_DEBUG,RANGE_FIX,CAT_INDEXES,NUM_COL_RANGE,CAT_COL_RANGE = validator(
+            df,QI_attr,Sensitive_attr,cat_indecies,nan_replacement_int,nan_replacement_str)
 
         gv = [QI, SA, IS_CAT, QI_LEN, QI_RANGE_VAL, _df,NUM_COL,NUM_COL_RANGE,CAT_COL,CAT_COL_RANGE,CAT_INDEXES,RANGE_FIX]
         gvname = ['QI', 'SA', 'IS_CAT', 'QI_LEN', 'QI_RANGE_VAL', '_df','NUM_COL','NUM_COL_RANGE','CAT_COL','CAT_COL_RANGE','CAT_INDEXES','RANGE_FIX']
@@ -42,7 +43,6 @@ class InputValidator:
         elif(len(sensitive_attributes) == 0):
             raise AnonymizeError(message = "Sensitive Attributes cannot be empty")
         return True
-
 
 def validator(dataframe,QI_,SA_,CAT_INDEXES_,nan_replacement_int,nan_replacement_str):
     global QI_LEN,QI,_df,SA,IS_CAT,QI_RANGE_VAL,QI_RANGE_VAL,CAT_UNIQUE,NUM_COL,CAT_COL,_DEBUG,RANGE_FIX,CAT_INDEXES,NUM_COL_RANGE,CAT_COL_RANGE
@@ -91,9 +91,6 @@ def validator(dataframe,QI_,SA_,CAT_INDEXES_,nan_replacement_int,nan_replacement
             if(len(CAT_INDEXES_) != 0):
                 for index in CAT_INDEXES_:
                     IS_CAT[index] = True
-                print("\n")
-                print(CAT_INDEXES_,IS_CAT)
-                print("\n")
         except:
             raise AnonymizeError(message = "Invalid index for categorical indexes")
         NUM_COL_RANGE=[]
@@ -131,7 +128,7 @@ def numerical_validator(value,nan_replace_int):
         return nan_replace_int
     except Exception as e:
         if(_DEBUG):
-            print(e)                                                              ################################################
+            print(e)
         return nan_replace_int
 
 def marking_globals(df):
@@ -139,7 +136,7 @@ def marking_globals(df):
     CAT_INDEXES,CAT_COL,NUM_COL = [],[],[]
     drop_col = []
     CAT_UNIQUE = []
-    _DEBUG = True
+    _DEBUG = False
     QI_RANGE_VAL = []
     RANGE_FIX = 1
     if(_DEBUG):

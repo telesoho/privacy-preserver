@@ -3,12 +3,13 @@ import numpy as np
 import pandas as pd
 import sys
 import os
-from color import bcolors as C 
 import inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
+
 from preserver.mondrian_preserver import Preserver
+from color import bcolors as C 
 
 from  functools import wraps 
 

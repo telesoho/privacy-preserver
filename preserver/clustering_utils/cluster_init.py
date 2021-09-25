@@ -7,7 +7,8 @@ class ClusterInit:
         
         length = len(dataframe)
         probs = [dataframe[column].value_counts()/length  for column in gv.GV['QI']]
-        dataframe['probability_sum'] = dataframe[gv.GV['QI']].apply(lambda row: np.sum([probs[i][row[column]] for i,column in enumerate(gv.GV['QI'])]),axis = 1)
+        dataframe['probability_sum'] = dataframe[gv.GV['QI']].apply(
+          lambda row: np.sum([probs[i][row[column]] for i,column in enumerate(gv.GV['QI'])]),axis = 1)
         points = dataframe.sample(n = n_clusters , weights = 'probability_sum')
         dataframe = dataframe[gv.GV['QI']]
         return points[gv.GV['QI']]

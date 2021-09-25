@@ -15,7 +15,6 @@ from .clustering_utils.cluster_init import ClusterInit
 from .clustering_utils.kmodes import Kmodehelpers
 from .clustering_utils.distance_calculation import Calculator
 
-
 class Kanonymizer(object):
     def __init__(self, df, QI_attr, Sensitive_attr, cat_indecies, verbose=1, max_iter=10, anonimize_ratio=1, max_cluster_distance=20):
         '''
@@ -153,8 +152,8 @@ class Kanonymizer(object):
         num_of_iter = 0
         while(not(self.df['cluster_number'] != -1).all()):
             num_of_iter += 1
-            best_clusters = (self.df.loc[self.df['cluster_number'] == -1]
-                             ).apply(lambda row: self._clustering2(row), axis=1)
+            df = self.df.loc[self.df['cluster_number'] == -1]
+            best_clusters = df.apply(lambda row: self._clustering2(row), axis=1)
             self.df.at[best_clusters.index,
                        'cluster_number'] = best_clusters.values
             self._adjust_big_clusters1()
@@ -168,8 +167,7 @@ class Kanonymizer(object):
         """
         global row_number
         row_number += 1
-        best_cluster = Clustering.find_best_cluster(
-            self.df, row, self.centroids)
+        best_cluster = Clustering.find_best_cluster(self.df, row, self.centroids)
         return best_cluster
 
     def _clustering2(self, row):
@@ -202,13 +200,13 @@ class Kanonymizer(object):
         columns = pd.DataFrame(km.cluster_centroids_, columns=gv.GV['QI'])
 
         columns[gv.GV['NUM_COL']] = columns[gv.GV['NUM_COL']
-                                            ].applymap(lambda x: np.float(x))
+                                            ].applymap(lambda x: float(x))
         self.df[gv.GV['NUM_COL']] = self.df[gv.GV['NUM_COL']
-                                            ].applymap(lambda x: np.float(x))
+                                            ].applymap(lambda x: float(x))
         columns[gv.GV['CAT_COL']] = columns[gv.GV['CAT_COL']
-                                            ].applymap(lambda x: np.str(x))
+                                            ].applymap(lambda x: str(x))
         self.df[gv.GV['CAT_COL']] = self.df[gv.GV['CAT_COL']
-                                            ].applymap(lambda x: np.str(x))
+                                            ].applymap(lambda x: str(x))
         self.df['cluster_number'] = list(km.labels_)
         non_zero_member_cluster_indices = self.df.groupby('cluster_number').filter(
             lambda grp: len(grp) != 0)['cluster_number'].unique()
@@ -302,7 +300,7 @@ class Kanonymizer(object):
         categorical_col = self.centroids[gv.GV['CAT_COL']]
         numerical_col = self.centroids[gv.GV['NUM_COL']]
         ranges = numerical_col.max() - numerical_col.min()
-        return np.sum(cal_num_col_dist(cluster_[gv.GV['NUM_COL']], numerical_col, ranges, 20), axis=1) + cal_cat_col_dist3(cluster_, categorical_col)
+        return np.sum(Calculator.cal_num_col_dist(cluster_[gv.GV['NUM_COL']], numerical_col, ranges, 20), axis=1) + Calculator.cal_cat_col_dist3(cluster_, categorical_col)
 
     def _cluster_data_loss(self, apply_for='less_clusters', initialize=True):
         '''
@@ -341,7 +339,7 @@ class Kanonymizer(object):
         else:
             cat_distances = np.apply_along_axis(
                 categorical_dataloss, 1, groups, groups)
-            num_distance = center_groups.apply(lambda row: numerical_dataloss(
+            num_distance = center_groups.apply(lambda row: Calculator.numerical_dataloss(
                 row[gv.GV['NUM_COL']], center_num, ranges))
             cat_frame_indices = self.centroids.index
         shape = cat_distances.shape
@@ -418,10 +416,10 @@ class Kanonymizer(object):
         self.df_second_copy[gv.GV['QI']] = self.df_second_copy.apply(
             lambda row: anom_vals.loc[row['cluster_number']], axis=1)
 
-    def set_nan_replacement_int(replacement):
+    def set_nan_replacement_int(self, replacement):
         self.nan_replacement_int = replacement
 
-    def set_nan_replacement_str(replacement):
+    def set_nan_replacement_str(self, replacement):
         self.nan_replacement_str = replacement
 
 
@@ -437,8 +435,8 @@ class LDiversityAnonymizer():
 ########### Methods to write pandas dataframe to a file  #########################
 
     def file_write(self, file_name='output.csv', sep_=',', encoding_='utf-8'):
-        self.df[quasi_identifiers +
-                sensitive_attributes].to_csv(file_name, sep=sep_, encoding=encoding_)
+        self.df[self.quasi_identifiers +
+                self.sensitive_attributes].to_csv(file_name, sep=sep_, encoding=encoding_)
 
 ########## Method to perform L Diversity #########################################
 
@@ -478,8 +476,8 @@ class TClosenessAnonymizer():
 ########### Methods to write pandas dataframe to a file  #########################
 
     def file_write(self, file_name='output.csv', sep_=',', encoding_='utf-8'):
-        self.df[quasi_identifiers +
-                sensitive_attributes].to_csv(file_name, sep=sep_, encoding=encoding_)
+        self.df[self.quasi_identifiers +
+                self.sensitive_attributes].to_csv(file_name, sep=sep_, encoding=encoding_)
 
 ########## Method to perform T Closeness #########################################
 

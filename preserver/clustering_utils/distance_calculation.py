@@ -12,7 +12,8 @@ class Calculator:
         range_value :- Clusters range values   type :- Pandas DataFrame
         factor :- factor need to multiply. Recommended 20. type:- Integer
         '''
-        return abs((cluster_record - record)/range_value*factor)
+        range_value = range_value.where(range_value != 0, np.nan)
+        return abs((cluster_record - record)/(range_value*factor)).fillna(0)
 
     @staticmethod
     def cal_cat_col_dist1(row,categorical_col):
