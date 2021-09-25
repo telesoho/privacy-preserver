@@ -303,17 +303,13 @@ class functionTest(unittest.TestCase):
         resultdf = Preserver.anonymize_user(
             df, k, user, usercolumn_name, sensitive_column, categorical, schema)
 
-        print(resultdf)
-
-        testdata = [[6, '1', 'test1', 'x', '20'],
-                    [6, '1', 'test1', 'y', '30'],
-                    [8, '1,2', 'test2,test3', 'x', '20-55'],
-                    [8, '1,2', 'test2,test3', 'x', '20-55'],
-                    [4, '1,2', 'test2,test3', 'y', '20-55'],
-                    [4, '1,2', 'test2,test3', 'y', '20-55']]
+        testdata = [['6', '1', 'test1', 'x', '20'],
+                    ['6', '1', 'test1', 'y', '30'],
+                    ['8', '1,2', 'test2,test3', 'x', '20-55'],
+                    ['8', '1,2', 'test2,test3', 'x', '20-55'],
+                    ['4', '1,2', 'test2,test3', 'y', '20-55'],
+                    ['4', '1,2', 'test2,test3', 'y', '20-55']]
         testdf = pd.DataFrame(testdata, columns=schema)
-
-        print(testdf)
 
         try:
             self.assertTrue(is_equal(testdf,resultdf))
