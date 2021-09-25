@@ -1,10 +1,10 @@
-from pyspark.sql.functions import udf  # type: ignore
-from pyspark.sql.types import DoubleType, StringType  # type: ignore
+# from pyspark.sql.functions import udf  # type: ignore
+# from pyspark.sql.types import DoubleType, StringType  # type: ignore
 from diffprivlib.mechanisms import LaplaceTruncated, Binary  # type: ignore
 from tabulate import tabulate  # type: ignore
-
+from pandas import DataFrame
 # Following imports provide type checking functionality to the library
-from pyspark.sql.dataframe import DataFrame as SparkDataFrame  # type: ignore
+# from pyspark.sql.dataframe import DataFrame as SparkDataFrame  # type: ignore
 from numbers import Real  # type: ignore
 from typing import List, Dict, Union, Optional  # type: ignore
 import sys  # type: ignore
@@ -66,7 +66,7 @@ class DPLib:
     def __init__(self,
                  global_epsilon: Union[int, float, None] = None,
                  global_delta: Union[int, float] = 0.0,
-                 sdf: Optional[SparkDataFrame] = None) -> None:
+                 sdf: Optional[DataFrame] = None) -> None:
         r""" Inits DPLib
 
         Args:
@@ -75,7 +75,7 @@ class DPLib:
             sdf: Spark DataFrame to be converted. Can change to a different DataFrame with set_df()
         """
 
-        self.sdf: Optional[SparkDataFrame] = None
+        self.sdf: Optional[DataFrame] = None
         self.set_sdf(sdf)
 
         self.__columns: Dict[str, Column] = {}
@@ -141,7 +141,7 @@ class DPLib:
         return True
 
     @staticmethod
-    def __check_labels(sdf: SparkDataFrame, column_name: str, label1: Optional[str], label2: Optional[str]) -> bool:
+    def __check_labels(sdf: DataFrame, column_name: str, label1: Optional[str], label2: Optional[str]) -> bool:
         r""" checks whether labels meet required conditions for method `execute`.
 
         Called only when category = 'boolean'
@@ -169,7 +169,7 @@ class DPLib:
         # finds unique values in a column
         labels: List[str] = [row[column_name] for row in sdf.select(column_name).distinct().collect()]
 
-        if len(labels) is not 2 or label1 not in labels or label2 not in labels:
+        if len(labels) != 2 or label1 not in labels or label2 not in labels:
             # checks whether all the rows of column have either label1 or label2
             raise ValueError("Labels in column `%s` does not match with labels entered" % column_name)
 
@@ -200,7 +200,7 @@ class DPLib:
         return True
 
     @staticmethod
-    def __check_sdf(sdf: SparkDataFrame) -> bool:
+    def __check_sdf(sdf: DataFrame) -> bool:
         r"""
 
         Args:
@@ -212,7 +212,7 @@ class DPLib:
 
         """
 
-        if sdf is not None and not isinstance(sdf, SparkDataFrame):
+        if sdf is not None and not isinstance(sdf, DataFrame):
             raise TypeError('Given sdf is not a Spark DataFrame')
 
         return True
@@ -247,7 +247,7 @@ class DPLib:
         if self.__check_sensitivity(sensitivity):
             self.__sensitivity = float(sensitivity)
 
-    def set_sdf(self, sdf: SparkDataFrame) -> None:
+    def set_sdf(self, sdf: DataFrame) -> None:
         r""" sets Spark DataFrame object to class.
 
         Args:
@@ -324,7 +324,7 @@ class DPLib:
             column['epsilon'] = epsilon
             column['delta'] = delta
 
-        if category is 'numeric':
+        if category == 'numeric':
 
             if sensitivity is None:
                 sensitivity = self.__sensitivity
@@ -345,7 +345,7 @@ class DPLib:
                 else:
                     column['round'] = round
 
-        if category is 'boolean':
+        if category == 'boolean':
             if self.__check_labels(self.sdf, column_name, label1, label2):
                 column['label1'] = label1
                 column['label2'] = label2
@@ -403,7 +403,7 @@ class DPLib:
                          ]
             column_table.append(row)
 
-        if self.sdf is not None and isinstance(self.sdf, SparkDataFrame):
+        if self.sdf is not None and isinstance(self.sdf, DataFrame):
             for column in self.sdf.columns:
                 if column not in self.__columns:
                     row = [column]
@@ -435,10 +435,11 @@ class DPLib:
 
         for column_name, details in self.__columns.items():
 
-            if details['category'] is 'numeric':
+            if details['category'] == 'numeric':
 
-                self.sdf = self.sdf.withColumn(colName=column_name,
-                                               col=self.sdf[column_name].cast(DoubleType()))
+                # self.sdf = self.sdf.withColumn(colName=column_name,
+                #                                col=self.sdf[column_name].cast(DoubleType()))
+                self.sdf = self.sdf.assign({column_name : lambda x: 0})
 
                 laplace.set_epsilon_delta(epsilon=details['epsilon'], delta=details['delta'])
                 laplace.set_sensitivity(details['sensitivity'])
@@ -449,25 +450,26 @@ class DPLib:
                     def round_randomise(cell):
                         return float(round(laplace.randomise(cell), details['round'])) if cell is not None else None
 
-                    round_randomise_udf = udf(f=round_randomise, returnType=DoubleType())
 
-                    self.sdf = self.sdf.withColumn(colName=column_name,
-                                                   col=round_randomise_udf(column_name))
+                    # self.sdf = self.sdf.withColumn(colName=column_name,
+                    #                                col=round_randomise_udf(column_name))
+                    self.sdf = self.sdf.assign({column_name: round_randomise})
 
                 else:
 
                     def randomise(cell):
                         return float(laplace.randomise(cell)) if cell is not None else None
 
-                    randomise_udf = udf(f=randomise, returnType=DoubleType())
+                    # randomise_udf = udf(f=randomise, returnType=DoubleType())
 
-                    self.sdf = self.sdf.withColumn(colName=column_name,
-                                                   col=randomise_udf(column_name))
+                    # self.sdf = self.sdf.withColumn(colName=column_name,
+                    #                                col=randomise_udf(column_name))
+                    self.sdf = self.sdf.assign({column_name: round_randomise})
 
-            elif details['category'] is 'boolean':
+            elif details['category'] == 'boolean':
 
-                self.sdf = self.sdf.withColumn(colName=column_name,
-                                               col=self.sdf[column_name].cast(StringType()))
+                # self.sdf = self.sdf.withColumn(colName=column_name,
+                #                                col=self.sdf[column_name].cast(StringType()))
 
                 binary.set_epsilon_delta(epsilon=details['epsilon'], delta=details['delta'])
                 binary.set_labels(value0=details['label1'], value1=details['label2'])
@@ -475,7 +477,9 @@ class DPLib:
                 def randomise(cell):
                     return binary.randomise(cell) if cell is not None else None
 
-                randomise_udf = udf(f=randomise, returnType=StringType())
+                # randomise_udf = udf(f=randomise, returnType=StringType())
 
-                self.sdf = self.sdf.withColumn(colName=column_name,
-                                               col=randomise_udf(column_name))
+                # self.sdf = self.sdf.withColumn(colName=column_name,
+                #                                col=randomise_udf(column_name))
+                self.sdf = self.sdf.assign({column_name: randomise})
+
