@@ -114,65 +114,37 @@ class Preserver:
 
     @staticmethod
     def k_anonymize_w_user(df, k, feature_columns, sensitive_column, categorical, schema):
-
-        def anonymize(pdf):
-            a_df = k_anonymizer_w_user(pdf, k, feature_columns,
-                                       sensitive_column, categorical)
-            return a_df
-
-        return df.groupby().apply(anonymize)
+        a_df = k_anonymizer_w_user(df, k, feature_columns,
+                                    sensitive_column, categorical)
+        return a_df
 
     @staticmethod
     def l_diversity(df, k, l, feature_columns, sensitive_column, categorical, schema):
-
-        @pandas_udf(schema, PandasUDFType.GROUPED_MAP)
-        def anonymize(pdf):
-            a_df = l_diversity_anonymizer(pdf, k, l, feature_columns,
-                                          sensitive_column, categorical)
-            return a_df
-
-        return df.groupby().apply(anonymize)
+        a_df = l_diversity_anonymizer(df, k, l, feature_columns,
+                                        sensitive_column, categorical)
+        return a_df
 
     @staticmethod
     def l_diversity_w_user(df, k, l, feature_columns, sensitive_column, categorical, schema):
-
-        @pandas_udf(schema, PandasUDFType.GROUPED_MAP)
-        def anonymize(pdf):
-            a_df = l_diversity_anonymizer_w_user(pdf, k, l, feature_columns,
-                                                 sensitive_column, categorical)
-            return a_df
-
-        return df.groupby().apply(anonymize)
+        a_df = l_diversity_anonymizer_w_user(df, k, l, feature_columns,
+                                                sensitive_column, categorical)
+        return a_df
 
     @staticmethod
     def t_closeness(df, k, t, feature_columns, sensitive_column, categorical, schema):
-
-        @pandas_udf(schema, PandasUDFType.GROUPED_MAP)
-        def anonymize(pdf):
-            a_df = t_closeness_anonymizer(pdf, k, t, feature_columns,
-                                          sensitive_column, categorical)
-            return a_df
-
-        return df.groupby().apply(anonymize)
+        a_df = t_closeness_anonymizer(df, k, t, feature_columns,
+                                        sensitive_column, categorical)
+        return a_df
 
     @staticmethod
     def t_closeness_w_user(df, k, t, feature_columns, sensitive_column, categorical, schema):
+        a_df = t_closeness_anonymizer_w_user(df, k, t, feature_columns,
+                                                sensitive_column, categorical)
+        return a_df
 
-        @pandas_udf(schema, PandasUDFType.GROUPED_MAP)
-        def anonymize(pdf):
-            a_df = t_closeness_anonymizer_w_user(pdf, k, t, feature_columns,
-                                                 sensitive_column, categorical)
-            return a_df
-
-        return df.groupby().apply(anonymize)
 
     @staticmethod
     def anonymize_user(df, k, user, usercolumn_name, sensitive_column, categorical, schema, random=False):
-
-        @pandas_udf(schema, PandasUDFType.GROUPED_MAP)
-        def anonymize(pdf):
-            a_df = user_anonymizer(
-                pdf, k, user, usercolumn_name, sensitive_column, categorical, random)
-            return a_df
-
-        return df.groupby().apply(anonymize)
+        a_df = user_anonymizer(
+            df, k, user, usercolumn_name, sensitive_column, categorical, random)
+        return a_df

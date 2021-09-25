@@ -394,7 +394,6 @@ def user_anonymizer(df, k, user, usercolumn_name, sensitive_column, categorical,
 # """ --------------------------------------------------------------------------
 def agg_columns(df, partdf, indexes, columns, categorical):
 
-    print('columns:\n', columns)
     for column in columns:
 
         if column not in categorical:
