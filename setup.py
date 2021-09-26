@@ -20,15 +20,8 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=[
-        'pandas>=1.1',
-        'pyspark==2.4.5',
-        'pyarrow==0.17.1',
-        'diffprivlib==0.2.1',
-        'tabulate==0.8.7',
-        'mypy>=0.770',
+        'pandas>=1.3.2',
+        'numpy>=1.21.2',
         'kmodes'
-    ],
-    extras_requires={
-        'DPLib': ['notebook']
-    }
+    ]
 )
