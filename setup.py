@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="privacy_preserver",  # Replace with your own username
-    version="0.0.1",
+    version="1.0.1",
     author="telesoho",
     author_email="telesoho@gmail.com",
     description="Anonymizing Library",
