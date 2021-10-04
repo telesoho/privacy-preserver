@@ -70,7 +70,7 @@ Return type of all the non categorical columns will be string
 You need to always consider the count column when constructing the schema. Count column is an integer type column.
 
 ```python
-from privacy_preserver.mondrian_preserver import Preserver #requires pandas
+from preserver.mondrian_preserver import Preserver #requires pandas
 
 #df - pandas.dataframe - original dataframe
 #k - int - value of the k
@@ -119,7 +119,7 @@ Return type of all the non categorical columns will be string
 You need to always consider the count column when constructing the schema. Count column is an integer type column.
 
 ```python
-from privacy_preserver.mondrian_preserver import Preserver #requires pandas
+from preserver.mondrian_preserver import Preserver #requires pandas
 
 #df - spark.sql.dataframe - original dataframe
 #k - int - value of the k
@@ -219,7 +219,7 @@ This function provides a simple way to anonymize a given user in a dataset. Even
 This doesn't return a dataframe with count variable. Instead this returns the same dataframe, anonymized for the given user. Return type of user column and all the non categorical columns will be string.
 
 ```python
-from privacy_preserver.mondrian_preserver import Preserver #requires pandas
+from preserver.mondrian_preserver import Preserver #requires pandas
 
 #df - spark.sql.dataframe - original dataframe
 #k - int - value of the k
